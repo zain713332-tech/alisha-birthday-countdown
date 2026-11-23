@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alisha’s Birthday Countdown 💗</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: linear-gradient(160deg, #ffd6e7, #fff0f6 55%, #ffc1dc);
+    color: #8f2855;
+    display: flex;
+    justify-content: center;
+    padding: 28px 16px;
+  }
+  .card {
+    width: 100%;
+    max-width: 480px;
+    background: rgba(255,255,255,.88);
+    border-radius: 28px;
+    padding: 25px 20px 28px;
+    box-shadow: 0 12px 35px rgba(170, 55, 105, .18);
+    text-align: center;
+  }
+  .heart { font-size: 38px; }
+  h1 { margin: 5px 0 4px; font-size: 30px; }
+  .subtitle { margin: 0 0 18px; color: #b34b78; }
+  .target {
+    background: #ffe1ed;
+    border-radius: 18px;
+    padding: 13px;
+    margin-bottom: 18px;
+    font-weight: 700;
+  }
+  #countdown {
+    font-size: 22px;
+    font-weight: 800;
+    margin: 14px 0 22px;
+  }
+  .list { text-align: left; }
+  .day {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 13px;
+    margin: 8px 0;
+    border-radius: 15px;
+    background: #fff6fa;
+    border: 1px solid #ffd0e1;
+    cursor: pointer;
+    user-select: none;
+    transition: .2s;
+  }
+  .box {
+    width: 24px;
+    height: 24px;
+    border: 2px solid #e77aa7;
+    border-radius: 8px;
+    flex: 0 0 24px;
+    display: grid;
+    place-items: center;
+    font-weight: 900;
+    color: white;
+  }
+  .day.done { background: #f7b2ce; color: #fff; text-decoration: line-through; }
+  .day.done .box { background: #d94f88; border-color: #d94f88; }
+  .day.done .box::after { content: "✓"; }
+  .date { font-size: 13px; opacity: .75; margin-left: auto; }
+  .birthday {
+    margin-top: 18px;
+    padding: 18px;
+    border-radius: 18px;
+    background: #e85b94;
+    color: white;
+    font-size: 22px;
+    font-weight: 900;
+  }
+  .reset {
+    margin-top: 14px;
+    border: 0;
+    background: transparent;
+    color: #b34b78;
+    text-decoration: underline;
+    font-size: 14px;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="heart">🎀💗🎂💗🎀</div>
+  <h1>Alisha’s Birthday Countdown!</h1>
+  <p class="subtitle">Counting down to Alisha’s special day 💕</p>
+  <div class="target">🎂 Birthday: 16th December 2026 🎂</div>
+  <div id="countdown">Loading...</div>
+  <div class="list" id="list"></div>
+  <div class="birthday">🎉 HAPPY BIRTHDAY! 🎉<br>16 DECEMBER 💗</div>
+  <button class="reset" onclick="resetChecks()">Reset ticks</button>
+</div>
+<script>
+const birthday = new Date("2026-12-16T00:00:00");
+const start = new Date("2026-11-24T00:00:00");
+const list = document.getElementById("list");
+
+function formatDate(d) {
+  return d.toLocaleDateString("en-GB", {day:"numeric", month:"short"});
+}
+
+function buildList() {
+  list.innerHTML = "";
+  for (let i = 0; i < 22; i++) {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+
+    const key = "birthdayTick_" + d.toISOString().slice(0,10);
+    const row = document.createElement("label");
+    row.className = "day";
+    if (localStorage.getItem(key) === "1") row.classList.add("done");
+
+    row.innerHTML = `<span class="box"></span><span>Day ${i+1} 💕</span><span class="date">${formatDate(d)}</span>`;
+    row.onclick = () => {
+      const done = !row.classList.contains("done");
+      row.classList.toggle("done", done);
+      if (done) localStorage.setItem(key, "1");
+      else localStorage.removeItem(key);
+    };
+    list.appendChild(row);
+  }
+}
+
+function updateCountdown() {
+  const now = new Date();
+  const diff = birthday - now;
+  if (diff <= 0) {
+    document.getElementById("countdown").textContent = "IT'S YOUR BIRTHDAY! 🎂💗";
+    return;
+  }
+  const days = Math.floor(diff / 86400000);
+  const hours = Math.floor(diff / 3600000) % 24;
+  const mins = Math.floor(diff / 60000) % 60;
+  const secs = Math.floor(diff / 1000) % 60;
+  document.getElementById("countdown").textContent =
+    `${days} days • ${hours} hrs • ${mins} mins • ${secs} secs`;
+}
+
+function resetChecks() {
+  const keys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith("birthdayTick_")) keys.push(key);
+  }
+  keys.forEach(key => localStorage.removeItem(key));
+  buildList();
+}
+
+buildList();
+updateCountdown();
+setInterval(updateCountdown, 1000);
+</script>
+</body>
+</html>
